@@ -6,7 +6,7 @@
  - 1x GeekPi UPSplus Raspberry 
  - 2x Lion Cells 18650 3.7V
  - 1x microSD Card 64GB
- - 1x Fast Charger HIGH Quality (Original RPI4 
+ - 1x Fast Charger HIGH Quality (Original RPI4 Power Charger 3.5Amp)
 
 *Software Used:*
  - Raspberry OS 

@@ -24,7 +24,7 @@ Follow this steps:
  - Execute Script: RPI4-UPSplus-HA-Prep.sh
 
 # Lazy Lines
-' git clone https://github.com/hellresistor/Rpi-UPSplus-HA.git && bash Rpi-UPSplus-HA/RPI4-UPSplus-HA-Prep.sh '
+    git clone https://github.com/hellresistor/Rpi-UPSplus-HA.git && bash Rpi-UPSplus-HA/RPI4-UPSplus-HA-Prep.sh
 
 
 # Other Links NOT MISSING!

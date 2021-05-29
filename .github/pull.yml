@@ -1,0 +1,8 @@
+version: "1"
+rules:
+  - base: master
+    upstream: hellresistor:master
+    mergeMethod: hardreset
+  - base: docs
+    upstream: hellresistor:docs
+    mergeMethod: hardreset

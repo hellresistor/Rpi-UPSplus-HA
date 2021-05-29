@@ -28,6 +28,9 @@ Follow this steps:
 
 
 # Other Links NOT MISSING!
+ - https://www.raspberrypi.org/software/operating-systems
+ - https://www.raspberrypi.org/software/
+ - https://github.com/Kanga-Who/home-assistant
  - https://wiki.52pi.com/index.php/UPS_Plus_SKU:_EP-0136#UPS_Plus
  - https://github.com/balena-io/etcher/releases
  - https://github.com/frtz13/UPSPlus_mqtt.git

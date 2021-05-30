@@ -115,10 +115,6 @@ if curl -Lso- https://git.io/JLygb | bash ; then
 else
  error "A BIG PROBLEM with UPSplus scrypt ..."
 fi
-# Shutdown countdown in seconds
-i2cset -y 1 0x17 24 60
-# Back-On when AC detect
-i2cset -y 1 0x17 25 1
 
 ################################################
 ## Installing and config Mosquitto MQQTBroker ##

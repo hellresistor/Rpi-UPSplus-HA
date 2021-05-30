@@ -1,6 +1,11 @@
 # Rpi-UPSplus-HA
  A Script to help people to Install HomeAssistant Supervised on a Raspberry OS with Raspberry Pi 4 and GeekPi UPSplus
 
+*Scripts:*
+ - RPI4-UPSplus-HA-Prep.sh
+ - Rpi4-HA-MQTT-ONLY.sh
+ - Rpi4-UPS-ONLY.sh
+
 *Hardware Used:*
  - 1x Raspberry Pi 4 Model B
  - 1x GeekPi UPSplus Raspberry 
@@ -9,13 +14,13 @@
  - 1x Fast Charger HIGH Quality (Original RPI4 Power Charger 3.5Amp)
 
 *Software Used:*
- - Raspberry OS 
+ - Raspbian OS 
  - HomeAssistant Supervised
  - Mosquitto MQQT Broker Localserver
- - GeekPi UPSplus python script
- - frtz13 python script
+ - @geeekpi UPSplus python script
+ - @frtz13 python script
 
-# How Use it ?
+# How Use RPI4-UPSplus-HA-Prep.sh or Rpi4-UPS-ONLY.sh ?
 Follow this steps:
  - Use BelenaEtcher or RaspberryPi Imager to write microSD card
  - GoTo 'config.txt' file and Add/Uncomment this line: 'dtparam=i2c_arm=on'
@@ -34,6 +39,7 @@ Follow this steps:
  - https://wiki.52pi.com/index.php/UPS_Plus_SKU:_EP-0136#UPS_Plus
  - https://github.com/balena-io/etcher/releases
  - https://github.com/frtz13/UPSPlus_mqtt.git
+ - https://github.com/ArjenR49/UPS-Plus.git
  
 
 # Help improoving :)

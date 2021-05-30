@@ -1,15 +1,15 @@
 #!/bin/bash
 ############################################################
 ## Dedicated Script to Community GeekPi and HomeAssistant ##
-##                                                        ##
-## by: hellresistor        2021-05        V0.4 Alpha      ##
+##     RaspberryPi + RaspbianOS + UPSplus + HA + MQTT     ##
+##  by: hellresistor         2021-05         V0.5 Alpha   ##
 ############################################################
 # shellcheck disable=SC1091
 
 ####################
 ## CHANGE IT ZONE ##
-MYMQQTUSER="homeassistant"
-MYMQQTPASS="Str0ngP455w0rd"
+MYMQTTUSER="homeassistant"
+MYMQTTPASS="Str0ngP455w0rd"
 RPIBUILD="raspberrypi4"
 
 ###############
@@ -102,7 +102,7 @@ if curl -sL "https://raw.githubusercontent.com/Kanga-Who/home-assistant/master/s
  echo
  info "PLEASE, Wait here, and Finish the HomeAssistant Setup on WebPage"
  warn "If unable open http://$MYIP:8123 , just wait little more and keep trying !!!"
- info "When In HomeAssistant Dashboard, Back here and"
+ info "When you ENTER ON HomeAssistant DASHBOARD, Back here and ..."
  read -n 1 -r -s -p $'Press enter to continue...\n'
  ok "HomeAssistant Supervised Installed Succefully !! "
 else
@@ -125,33 +125,33 @@ fi
 #fi
 
 ################################################
-## Installing and config Mosquitto MQQTBroker ##
-info "Installing and configuring Mosquitto MQQTBroker Server ..."
+## Installing and config Mosquitto MQTTBroker ##
+info "Installing and configuring Mosquitto MQTTBroker Server ..."
 if cat >>  /etc/mosquitto/conf.d/mosquitto.conf <<EOTF
 allow_anonymous false
 password_file /etc/mosquitto/conf.d/pwfile
 port 1883
 EOTF
 then
- ok "Mosquito MQQT Broker Server Configured Succefully !!"
+ ok "Mosquito MQTT Broker Server Configured Succefully !!"
 else
-  error "Mosquito MQQT Broker Server NOT Configured ..."
+  error "Mosquito MQTT Broker Server NOT Configured ..."
 fi
-if echo -e "${MYMQQTPASS}//n${MYMQQTPASS}" | sudo mosquitto_passwd -c /etc/mosquitto/conf.d/pwfile $MYMQQTUSER
+if echo -e "${MYMQTTPASS}//n${MYMQTTPASS}" | sudo mosquitto_passwd -c /etc/mosquitto/conf.d/pwfile $MYMQTTUSER
 then
- ok "Created $MYMQQTUSER User for Mosquitto Succefully !!"
+ ok "Created $MYMQTTUSER User for Mosquitto Succefully !!"
 else
- error "Some problem creating user $MYMQQTUSER to Mosquitto ..."
+ error "Some problem creating user $MYMQTTUSER to Mosquitto ..."
 fi
 if sudo service mosquitto restart
 then
-  ok "Mosquito MQQT Broker Restarted Succefully !!"
+  ok "Mosquito MQTT Broker Restarted Succefully !!"
 else
-  error "Some problem with Mosquito MQQT Broker Service ..."
+  error "Some problem with Mosquito MQTT Broker Service ..."
 fi
 info "Add Mosquitto configuration into homeassistant configuration.yaml file..."
 if cat >> /usr/share/hassio/homeassistant/configuration.yaml <<EOTF
-# Local MQQT server
+# Local MQTT server
 mqtt:
   discovery: true
   discovery_prefix: homeassistant
@@ -159,19 +159,19 @@ mqtt:
   port: 1883
   client_id: home-assistant-1
   keepalive: 60
-  username: $MYMQQTUSER
-  password: $MYMQQTPASS
+  username: $MYMQTTUSER
+  password: $MYMQTTPASS
 
 EOTF
 then
- ok "Mosquito MQQT Broker added to homeassistant configuration.yaml file Succefully !!"
+ ok "Mosquito MQTT Broker added to homeassistant configuration.yaml file Succefully !!"
 else
-  error "Some problem adding Mosquito MQQT Broker into HomeAssistant configuration.yaml file ..."
+  error "Some problem adding Mosquito MQTT Broker into HomeAssistant configuration.yaml file ..."
 fi
 
 ########################################################
-## Configuring MQQTBroker to UPSplus On HomeAssistant ##
-info "Configuring MQQTBroker to UPSplus On HomeAssistant ..."
+## Configuring MQTTBroker to UPSplus On HomeAssistant ##
+info "Configuring MQTTBroker to UPSplus On HomeAssistant ..."
 cd /home/pi || error "Cannot find directory"
 #cd ~ || error "Cannot find directory"
 mkdir scripts logs
@@ -180,13 +180,13 @@ cp UPSPlus_mqtt/fanShutDownUps.py scripts/fanShutDownUps.py
 cp UPSPlus_mqtt/fanShutDownUps.ini scripts/fanShutDownUps.ini
 cp UPSPlus_mqtt/launcher.sh  scripts/launcher.sh
 sed -i "s/BROKER=.*/BROKER=$MYIP/" scripts/fanShutDownUps.ini || error "Unable to set BROKER into scripts/fanShutDownUps.ini"
-sed -i "s/USERNAME = .*/USERNAME = $MYMQQTUSER/" scripts/fanShutDownUps.ini || error "Unable to set USERNAME into scripts/fanShutDownUps.ini"
-sed -i "s/PASSWORD = .*/PASSWORD = $MYMQQTPASS/" scripts/fanShutDownUps.ini || error "Unable to set PASSWORD into scripts/fanShutDownUps.ini"
+sed -i "s/USERNAME = .*/USERNAME = $MYMQTTUSER/" scripts/fanShutDownUps.ini || error "Unable to set USERNAME into scripts/fanShutDownUps.ini"
+sed -i "s/PASSWORD = .*/PASSWORD = $MYMQTTPASS/" scripts/fanShutDownUps.ini || error "Unable to set PASSWORD into scripts/fanShutDownUps.ini"
 #sed -i "s/\/home\/pi/\/$USER/" scripts/launcher.sh || error "Unable to set right User Directory into scripts/fanShutDownUps.ini"
 sudo chown -R pi scripts && sudo chown -R pi logs
 if sudo -u pi -c 'python3 UPSPlus_mqtt/fanShutDownUps.py &'
 then
- ok "Mosquitto MQQT Broker installed and Runnnig Succefully !! "
+ ok "Mosquitto MQTT Broker installed and Runnnig Succefully !! "
 else
  error "A @frtz13 python script BIG PROBLEM !!!!"
 fi

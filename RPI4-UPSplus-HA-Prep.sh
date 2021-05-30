@@ -23,12 +23,12 @@ function info { echo "[INFO] $*"; sleep 1; }
 ###################
 ## Verify system ##
 info "Checking Compatible System ..."
-if id "pi" >/dev/null 2>&1; then
+if [[ "$USER" == "pi" ]] ; then
  error "Please use < sudo -i > command to log as root"
-elif id "root" >/dev/null 2>&1; then
+elif [[ "$USER" == "root" ]]; then
  ok "Root User Logged"
 else
- error "User NOT VALID"
+ error "$USER User NOT VALID. Use root"
 fi
 case "${ID,,}" in
  raspbian) ok "Raspbian System Detected !!" ;;

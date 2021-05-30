@@ -137,8 +137,12 @@ then
 else
   error "Mosquito MQQT Broker Server NOT Configured ..."
 fi
-info "Set Password for Mosquitto user $MYMQQTUSER: "
-sudo mosquitto_passwd -c /etc/mosquitto/conf.d/pwfile $MYMQQTUSER
+if echo -e "${MYMQQTPASS}//n${MYMQQTPASS}" | sudo mosquitto_passwd -c /etc/mosquitto/conf.d/pwfile $MYMQQTUSER
+then
+ ok "Created $MYMQQTUSER User for Mosquitto Succefully !!"
+else
+ error "Some problem creating user $MYMQQTUSER to Mosquitto ..."
+fi
 if sudo service mosquitto restart
 then
   ok "Mosquito MQQT Broker Restarted Succefully !!"

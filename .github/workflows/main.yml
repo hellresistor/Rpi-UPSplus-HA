@@ -7,9 +7,12 @@ on:
   pull_request:
     
 jobs:
-  LintShellCheck:
-    runs-on: ubuntu-latest
+  lint:
+    runs-on: debian-latest
     steps:
+      - name: Checkout code
       - uses: actions/checkout@v1
-      - name: Lint check
-        uses: azohra/shell-linter@v0.4.0
+      - name: Run Shellcheck
+        uses: azohra/shell-linter@latest
+        with:
+          path: "RPI4-UPSplus-HA-Prep.sh"

@@ -14,8 +14,8 @@ RPIBUILD="raspberrypi4"
 ###############
 ## Variables ##
 MYIP=$(ifconfig eth0 | awk '{ print $2}' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
-MYDEPPACKAGES=("sudo" "git" "curl" "network-manager" "software-properties-common" "apt-transport-https" "apparmor-utils" "ca-certificates" "dbus" "jq" "python3" "python3-pip" "i2c-tools" "mosquitto" "mosquitto-clients")
-MYPYTHONDEP=("RPi.GPIO" "smbus" "smbus2" "pi-ina219" "paho-mqtt" "requests")
+MYDEPPACKAGES=(sudo git curl network-manager software-properties-common apt-transport-https apparmor-utils ca-certificates dbus jq python3 python3-pip i2c-tools mosquitto mosquitto-clients)
+MYPYTHONDEP=(RPi.GPIO smbus smbus2 pi-ina219 paho-mqtt requests)
 source /etc/os-release
 
 #####################
@@ -47,29 +47,24 @@ esac
 #############################
 ## Installing dependencies ##
 info "Updating System ..."
-apt -y update && apt -y upgrade
+apt-get -y update && apt-get -y upgrade
 info "Installing Dependencies ..."
-for i in "${MYDEPPACKAGES[@]}"
- do
-  if ! command -v "$i" > /dev/null 2>&1 || { 
-   info "Installing $i package ..."; 
-   sudo apt -y install "$i";}; then
+for i in "${MYDEPPACKAGES[@]}" ; do
+ if command -v "$i" > /dev/null 2>&1; then
+  info "Package $i is already Installed ..."
+ else 
+  if sudo apt-get -y install "$i" > /dev/null 2>&1; then
    ok "Package $i installed !!"
   else
-   error "Some problem ..."
+   error "Unable install $i package ..."
   fi
- done
+ fi
+done
 info "Installing python3 Dependencies ..."
-for f in "${MYPYTHONDEP[@]}"
- do
-  if ! command -v "pip3 $f" > /dev/null 2>&1 || { 
-   info "Installing $f package ..."; 
-   sudo pip3 install "$f" ;}; then
-   ok "Package $i installed !!"
-  else
-   error "Some problem ..."
-  fi
- done
+for f in "${MYPYTHONDEP[@]}" ; do
+ info "Installing $f package ..."
+ pip3 install "$f" > /dev/null 2>&1
+done
 
 ############################
 ## Configuring the System ##

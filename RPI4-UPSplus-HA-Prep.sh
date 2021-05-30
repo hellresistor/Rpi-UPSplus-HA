@@ -47,7 +47,7 @@ esac
 #############################
 ## Installing dependencies ##
 info "Updating System ..."
-apt-get -y update && apt-get -y upgrade
+apt-get -y update > /dev/null 2>&1 && apt-get -y upgrade > /dev/null 2>&1
 info "Installing Dependencies ..."
 for i in "${MYDEPPACKAGES[@]}" ; do
  if command -v "$i" > /dev/null 2>&1; then
@@ -69,32 +69,34 @@ done
 ############################
 ## Configuring the System ##
 info "Configuring System ..."
-if sudo systemctl disable ModemManager ; then
+if sudo systemctl disable ModemManager > /dev/null 2>&1 ; then
   ok "ModemManager Disabled !!"
 else
-  error "Some problem ..."
+  error "Some problem on ModemManager service ..."
 fi
-if sudo systemctl stop ModemManager ; then
-  ok "ModemManager Disabled !!"
+if sudo systemctl stop ModemManager > /dev/null 2>&1 ; then
+  ok "ModemManager Stopped !!"
 else
-  error "Some problem ..."
+  error "Some problem on ModemManager service ..."
 fi
 ##mount | grep securityfs
 ##mount securityfs -t securityfs /sys/kernel/security
-if sed 's/.*/& lsm=apparmor/' /boot/cmdline.txt ; then
+if sed -i 's/.*/& lsm=apparmor/' /boot/cmdline.txt ; then
   ok "apparmor added into cmdline.txt file Succefully !!"
 else
-  error "Some problem ..."
+  error "Some problem adding apparmor config ..."
 fi
 
 #########################################
 ## Installing HomeAssistant Supervised ##
 cd ~ || error "Cannot find directory"
-if curl -fsSL get.docker.com | sh ; then
+info "Installing Docker ..."
+if curl -fsSL get.docker.com | sh > /dev/null 2>&1 ; then
  ok "Docker Installed Succefully !! "
 else
  error "A DOCKER BIG PROBLEM !!!!"
 fi
+info "Installing HomeAssistant Supervised ..."
 if curl -sL "https://raw.githubusercontent.com/Kanga-Who/home-assistant/master/supervised-installer.sh" | bash -s -- -m "$RPIBUILD"; then
  ok "HomeAssistant Supervised Installed Succefully !! "
 else
@@ -110,7 +112,7 @@ else
   error "i2c NOT added into /boot/config.txt file ..."
 fi
 cd ~ || error "Cannot find directory"
-if curl -Lso- https://git.io/JLygb | bash ; then
+if curl -Lso- https://git.io/JLygb | bash > /dev/null 2>&1 ; then
  ok "UPSplus Installed Succefully !!"
 else
  error "A BIG PROBLEM with UPSplus scrypt ..."
@@ -159,12 +161,13 @@ then
 else
   error "Some problem adding Mosquito MQQT Broker into HomeAssistant configuration.yaml file ..."
 fi
+
 ########################################################
 ## Configuring MQQTBroker to UPSplus On HomeAssistant ##
 info "Configuring MQQTBroker to UPSplus On HomeAssistant ..."
 cd ~ || error "Cannot find directory"
 mkdir scripts logs
-git clone https://github.com/frtz13/UPSPlus_mqtt.git
+git clone https://github.com/frtz13/UPSPlus_mqtt.git > /dev/null 2>&1
 cp UPSPlus_mqtt/fanShutDownUps.py scripts/fanShutDownUps.py
 cp UPSPlus_mqtt/fanShutDownUps.ini scripts/fanShutDownUps.ini
 cp UPSPlus_mqtt/launcher.sh  scripts/launcher.sh
@@ -355,3 +358,5 @@ echo
 warn "If unable open http://$MYIP:8123 , just wait little more !!!" && sleep 5
 info "After HomeAssistant Wizard Completed, a reboot command should be executed on Raspberry System :) "
 apt-get -y autoremove
+
+exit 0

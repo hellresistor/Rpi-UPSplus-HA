@@ -1,9 +1,5 @@
-name: LintCheck
-on:
-  push:
-    branches:
-      - master
-  pull_request:
+name: ShellChecker
+on: [push]
 jobs:
   lint:
     runs-on: ubuntu-latest

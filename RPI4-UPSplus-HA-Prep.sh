@@ -2,7 +2,7 @@
 ############################################################
 ## Dedicated Script to Community GeekPi and HomeAssistant ##
 ##                                                        ##
-## by: hellresistor        2021-05          V0.3          ##
+## by: hellresistor        2021-05        V0.4 Alpha      ##
 ############################################################
 # shellcheck disable=SC1091
 
@@ -117,12 +117,12 @@ if sed -i '/^dtparam=i2c_arm=on/a dtoverlay=i2c-rtc,ds1307' /boot/config.txt ; t
 else
   error "i2c NOT added into /boot/config.txt file ..."
 fi
-cd ~ || error "Cannot find directory"
-if curl -Lso- https://git.io/JLygb | bash > /dev/null 2>&1 ; then
- ok "UPSplus Installed Succefully !!"
-else
- error "A BIG PROBLEM with UPSplus scrypt ..."
-fi
+#cd ~ || error "Cannot find directory"
+#if curl -Lso- https://git.io/JLygb | bash > /dev/null 2>&1 ; then
+# ok "UPSplus Installed Succefully !!"
+#else
+# error "A BIG PROBLEM with UPSplus scrypt ..."
+#fi
 
 ################################################
 ## Installing and config Mosquitto MQQTBroker ##
@@ -141,7 +141,7 @@ info "Set Password for Mosquitto user $MYMQQTUSER: "
 sudo mosquitto_passwd -c /etc/mosquitto/conf.d/pwfile $MYMQQTUSER
 if sudo service mosquitto restart
 then
-  ok "Mosquito MQQT Broker Restarted Succefully  !!"
+  ok "Mosquito MQQT Broker Restarted Succefully !!"
 else
   error "Some problem with Mosquito MQQT Broker Service ..."
 fi
@@ -168,7 +168,8 @@ fi
 ########################################################
 ## Configuring MQQTBroker to UPSplus On HomeAssistant ##
 info "Configuring MQQTBroker to UPSplus On HomeAssistant ..."
-cd ~ || error "Cannot find directory"
+cd /home/pi || error "Cannot find directory"
+#cd ~ || error "Cannot find directory"
 mkdir scripts logs
 git clone https://github.com/frtz13/UPSPlus_mqtt.git > /dev/null 2>&1
 cp UPSPlus_mqtt/fanShutDownUps.py scripts/fanShutDownUps.py
@@ -177,12 +178,13 @@ cp UPSPlus_mqtt/launcher.sh  scripts/launcher.sh
 sed -i "s/BROKER=.*/BROKER=$MYIP/" scripts/fanShutDownUps.ini || error "Unable to set BROKER into scripts/fanShutDownUps.ini"
 sed -i "s/USERNAME = .*/USERNAME = $MYMQQTUSER/" scripts/fanShutDownUps.ini || error "Unable to set USERNAME into scripts/fanShutDownUps.ini"
 sed -i "s/PASSWORD = .*/PASSWORD = $MYMQQTPASS/" scripts/fanShutDownUps.ini || error "Unable to set PASSWORD into scripts/fanShutDownUps.ini"
-sed -i "s/\/home\/pi/\/$USER/" scripts/launcher.sh || error "Unable to set right User Directory into scripts/fanShutDownUps.ini"
-if python3 UPSPlus_mqtt/fanShutDownUps.py &
+#sed -i "s/\/home\/pi/\/$USER/" scripts/launcher.sh || error "Unable to set right User Directory into scripts/fanShutDownUps.ini"
+sudo chown -R pi scripts && sudo chown -R pi logs
+if sudo -u pi -c 'python3 UPSPlus_mqtt/fanShutDownUps.py &'
 then
  ok "Mosquitto MQQT Broker installed and Runnnig Succefully !! "
 else
- error "A @frtz13 pythin script BIG PROBLEM !!!!"
+ error "A @frtz13 python script BIG PROBLEM !!!!"
 fi
 
 ############################################
@@ -342,19 +344,20 @@ fi
 #######################
 ## Configure Crontab ##
 info "Configuring Crontab jobs ..."
-crontab -l > mycron
-echo "@reboot sh /$USER/scripts/launcher.sh >/$USER/logs/cronlog 2>&1" >> mycron
-echo "0 5 * * 5 sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove" >> mycron
-if crontab mycron ; then
+sudo -u pi -c 'crontab -l > mycron'
+#echo "@reboot sh /$USER/scripts/launcher.sh >/$USER/logs/cronlog 2>&1" >> mycron
+sudo -u pi -c 'echo "@reboot sh /home/pi/scripts/launcher.sh >/home/pi/logs/cronlog 2>&1" >> mycron'
+sudo -u pi -c 'echo "0 5 * * 5 sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove" >> mycron'
+if sudo -u pi -c 'crontab mycron' ; then
  ok "Set Crontab jobs Succefully !! "
 else
  error "Some problem adding the Crontab jobs ..."
 fi
-rm mycron
+sudo -u pi -c 'rm mycron'
 
 #############
 ## The END ##
 ok "Instalation and Configuration of Raspberry + UPSplus + HomeAssistant COMPLETED !!!"
 apt-get -y autoremove
-info "After HomeAssistant Wizard Completed, a reboot command should be executed on Raspberry System :) "
+info "A reboot command should be executed on this System :) "
 exit 0

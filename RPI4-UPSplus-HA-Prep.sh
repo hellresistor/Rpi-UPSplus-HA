@@ -47,16 +47,16 @@ esac
 #############################
 ## Installing dependencies ##
 info "Updating System ..."
-apt -y update && apt -y upgrade && apt -y autoremove
+apt -y update && apt -y upgrade
 info "Installing Dependencies ..."
 for i in "${MYDEPPACKAGES[@]}"
  do
   if ! command -v "$i" > /dev/null 2>&1 || { 
    info "Installing $i package ..."; 
    sudo apt -y install "$i";}; then
-   error "Some problem ..."
-  else
    ok "Package $i installed !!"
+  else
+   error "Some problem ..."
   fi
  done
 info "Installing python3 Dependencies ..."
@@ -65,9 +65,9 @@ for f in "${MYPYTHONDEP[@]}"
   if ! command -v "pip3 $f" > /dev/null 2>&1 || { 
    info "Installing $f package ..."; 
    sudo pip3 install "$f" ;}; then
-   error "Some problem ..."
-  else
    ok "Package $i installed !!"
+  else
+   error "Some problem ..."
   fi
  done
 
@@ -359,3 +359,4 @@ ok "http://$MYIP:8123" && sleep 2
 echo 
 warn "If unable open http://$MYIP:8123 , just wait little more !!!" && sleep 5
 info "After HomeAssistant Wizard Completed, a reboot command should be executed on Raspberry System :) "
+apt-get -y autoremove

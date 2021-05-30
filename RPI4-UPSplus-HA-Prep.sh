@@ -99,6 +99,11 @@ else
 fi
 info "Installing HomeAssistant Supervised ..."
 if curl -sL "https://raw.githubusercontent.com/Kanga-Who/home-assistant/master/supervised-installer.sh" | bash -s -- -m "$RPIBUILD"; then
+ echo
+ info "PLEASE, Wait here, and Finish the HomeAssistant Setup on WebPage"
+ warn "If unable open http://$MYIP:8123 , just wait little more and keep trying !!!"
+ info "When In HomeAssistant Dashboard, Back here and"
+ read -rsp $'Press any key to continue...\n' -n1 key
  ok "HomeAssistant Supervised Installed Succefully !! "
 else
  error "A HOMEASSISTANT INSTALLATION BIG PROBLEM !!!!"
@@ -132,17 +137,14 @@ then
 else
   error "Mosquito MQQT Broker Server NOT Configured ..."
 fi
-
 info "Set Password for Mosquitto user $MYMQQTUSER: "
 sudo mosquitto_passwd -c /etc/mosquitto/conf.d/pwfile $MYMQQTUSER
-
 if sudo service mosquitto restart
 then
   ok "Mosquito MQQT Broker Restarted Succefully  !!"
 else
   error "Some problem with Mosquito MQQT Broker Service ..."
 fi
-
 info "Add Mosquitto configuration into homeassistant configuration.yaml file..."
 if cat >> /usr/share/hassio/homeassistant/configuration.yaml <<EOTF
 # Local MQQT server
@@ -349,15 +351,10 @@ else
  error "Some problem adding the Crontab jobs ..."
 fi
 rm mycron
+
 #############
 ## The END ##
 ok "Instalation and Configuration of Raspberry + UPSplus + HomeAssistant COMPLETED !!!"
-ok "Now Wait a little bit (5minutes) the homeassistant are preparing" && sleep 5
-ok "Complete the HomeAssistant Wizard Accessing:"
-ok "http://$MYIP:8123" && sleep 2
-echo 
-warn "If unable open http://$MYIP:8123 , just wait little more !!!" && sleep 5
-info "After HomeAssistant Wizard Completed, a reboot command should be executed on Raspberry System :) "
 apt-get -y autoremove
-
+info "After HomeAssistant Wizard Completed, a reboot command should be executed on Raspberry System :) "
 exit 0

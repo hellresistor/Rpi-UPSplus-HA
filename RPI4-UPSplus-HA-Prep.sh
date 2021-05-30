@@ -1,10 +1,12 @@
 #!/bin/bash
 ############################################################
 ## Dedicated Script to Community GeekPi and HomeAssistant ##
+##                                                        ##
+## by: hellresistor        2021-05          V0.3          ##
 ############################################################
 
-###############
-## CHANGE IT ##
+####################
+## CHANGE IT ZONE ##
 MYMQQTUSER="homeassistant"
 MYMQQTPASS="Str0ngP455w0rd"
 RPIBUILD="raspberrypi4"
@@ -14,7 +16,10 @@ RPIBUILD="raspberrypi4"
 MYIP=$(ifconfig eth0 | awk '{ print $2}' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
 MYDEPPACKAGES=("sudo" "git" "curl" "network-manager" "software-properties-common" "apt-transport-https" "apparmor-utils" "ca-certificates" "dbus" "jq" "python3" "python3-pip" "i2c-tools" "mosquitto" "mosquitto-clients")
 MYPYTHONDEP=("RPi.GPIO" "smbus" "smbus2" "pi-ina219" "paho-mqtt" "requests")
+source /etc/os-release
 
+#####################
+## Basic functions ##
 function ok { echo "[OK] $*"; sleep 0.5; }
 function error { echo "[ERROR] $*"; sleep 0.5; exit 1; }
 function warn { echo "[WARN] $*"; sleep 1; }
@@ -35,8 +40,8 @@ case "${ID,,}" in
  *) error "Operating System NOT VALID" ;;
 esac
 case "$(uname -m)" in
- aarch64|arm) ok "ARCH $(uname -m) Detected !!" ;;
- *) error "Architeture system NOT VALID" ;;
+ aarch64|armv7l) ok "ARCH $(uname -m) Detected !!" ;;
+ *) error "$(uname -m) Architeture system NOT VALID" ;;
 esac
 
 #############################

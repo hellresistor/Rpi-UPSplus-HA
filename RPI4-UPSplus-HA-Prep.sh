@@ -103,8 +103,7 @@ if curl -sL "https://raw.githubusercontent.com/Kanga-Who/home-assistant/master/s
  info "PLEASE, Wait here, and Finish the HomeAssistant Setup on WebPage"
  warn "If unable open http://$MYIP:8123 , just wait little more and keep trying !!!"
  info "When In HomeAssistant Dashboard, Back here and"
- read -rsp $'Press any key to continue...\n' -n1 key
- ok "HomeAssistant Supervised Installed Succefully !! "
+ read -n 1 -r -s -p $'Press enter to continue...\n' ok "HomeAssistant Supervised Installed Succefully !! "
 else
  error "A HOMEASSISTANT INSTALLATION BIG PROBLEM !!!!"
 fi

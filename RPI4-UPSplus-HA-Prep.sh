@@ -73,12 +73,12 @@ info "Configuring System ..."
 if sudo systemctl disable ModemManager > /dev/null 2>&1 ; then
   ok "ModemManager Disabled !!"
 else
-  error "Some problem on ModemManager service ..."
+  warn "Some problem on ModemManager service ..."
 fi
 if sudo systemctl stop ModemManager > /dev/null 2>&1 ; then
   ok "ModemManager Stopped !!"
 else
-  error "Some problem on ModemManager service ..."
+  warn "Some problem on ModemManager service ..."
 fi
 ##mount | grep securityfs
 ##mount securityfs -t securityfs /sys/kernel/security
@@ -100,8 +100,8 @@ fi
 info "Installing HomeAssistant Supervised ..."
 if curl -sL "https://raw.githubusercontent.com/Kanga-Who/home-assistant/master/supervised-installer.sh" | bash -s -- -m "$RPIBUILD"; then
  echo
- info "PLEASE, Wait here, and Finish the HomeAssistant Setup on WebPage"
- warn "If unable open http://$MYIP:8123 , just wait little more and keep trying !!!"
+ info "PLEASE, Wait here like 30minutes, and Finish the HomeAssistant Setup on WebPage"
+ warn "If unable open http://$MYIP:8123 , just wait more and keep trying !!!"
  info "When you ENTER ON HomeAssistant DASHBOARD, Back here and ..."
  read -n 1 -r -s -p $'Press enter to continue...\n'
  ok "HomeAssistant Supervised Installed Succefully !! "

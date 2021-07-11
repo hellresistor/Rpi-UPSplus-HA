@@ -184,7 +184,7 @@ sed -i "s/USERNAME = .*/USERNAME = $MYMQTTUSER/" scripts/fanShutDownUps.ini || e
 sed -i "s/PASSWORD = .*/PASSWORD = $MYMQTTPASS/" scripts/fanShutDownUps.ini || error "Unable to set PASSWORD into scripts/fanShutDownUps.ini"
 #sed -i "s/\/home\/pi/\/$USER/" scripts/launcher.sh || error "Unable to set right User Directory into scripts/fanShutDownUps.ini"
 sudo chown -R pi scripts && sudo chown -R pi logs
-if sudo -u pi -c 'python3 UPSPlus_mqtt/fanShutDownUps.py &'
+if python3 /home/pi/UPSPlus_mqtt/fanShutDownUps.py --notimerbias &
 then
  ok "Mosquitto MQTT Broker installed and Runnnig Succefully !! "
 else
@@ -369,16 +369,16 @@ fi
 #######################
 ## Configure Crontab ##
 info "Configuring Crontab jobs ..."
-sudo -u pi -c 'crontab -l > mycron'
+crontab -l > mycron
 #echo "@reboot sh /$USER/scripts/launcher.sh >/$USER/logs/cronlog 2>&1" >> mycron
-sudo -u pi -c 'echo "@reboot sh /home/pi/scripts/launcher.sh >/home/pi/logs/cronlog 2>&1" >> mycron'
-sudo -u pi -c 'echo "0 5 * * 5 sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove" >> mycron'
-if sudo -u pi -c 'crontab mycron' ; then
+echo "@reboot sh /home/pi/scripts/launcher.sh >/home/pi/logs/cronlog 2>&1" >> mycron
+echo "0 5 * * 5 sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove" >> mycron
+if sudo crontab mycron ; then
  ok "Set Crontab jobs Succefully !! "
 else
  error "Some problem adding the Crontab jobs ..."
 fi
-sudo -u pi -c 'rm mycron'
+sudo rm mycron
 
 #############
 ## The END ##

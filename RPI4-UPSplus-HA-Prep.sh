@@ -21,10 +21,15 @@ source /etc/os-release
 
 #####################
 ## Basic functions ##
-function ok { echo "[OK] $*"; }
-function error { echo "[ERROR] $*"; exit 1; }
-function warn { echo "[WARN] $*"; }
-function info { echo "[INFO] $*"; }
+endy=$'\e[0m'
+greeny=$'\e[92m'
+bluey=$'\e[94m'
+redy=$'\e[91m'
+yellowy=$'\e[93m'
+function ok { echo -e "${greeny}[OK] $* ${endy}"; }
+function error { echo -e "${redy}[ERROR] $* ${endy}"; exit 1; }
+function warn { echo -e "${yellowy}[WARN] $* ${endy}"; }
+function info { echo -e "${bluey}[INFO] $* ${endy}"; }
 
 ###################
 ## Verify system ##
@@ -102,7 +107,7 @@ if curl -sL "https://raw.githubusercontent.com/Kanga-Who/home-assistant/master/s
  echo
  info "PLEASE, Wait here like 30minutes, and Finish the HomeAssistant Setup on WebPage"
  warn "If unable open http://$MYIP:8123 , just wait more and keep trying !!!"
- info "When you ENTER ON HomeAssistant DASHBOARD, Back here and ..."
+ info "When you ENTER ON HomeAssistant DASHBOARD, and Upload your configuration and than Back here and ..."
  read -n 1 -r -s -p $'Press enter to continue...\n'
  ok "HomeAssistant Supervised Installed Succefully !! "
 else
@@ -137,13 +142,13 @@ then
 else
   error "Mosquito MQTT Broker Server NOT Configured ..."
 fi
-if echo -e "${MYMQTTPASS}\n${MYMQTTPASS}\n" | sudo mosquitto_passwd -c /etc/mosquitto/conf.d/pwfile $MYMQTTUSER
+if echo -e "${MYMQTTPASS}\n${MYMQTTPASS}\n" | sudo mosquitto_passwd -c /etc/mosquitto/conf.d/pwfile $MYMQTTUSER  > /dev/null 2>&1
 then
  ok "Created $MYMQTTUSER User for Mosquitto Succefully !!"
 else
  error "Some problem creating user $MYMQTTUSER to Mosquitto ..."
 fi
-if sudo service mosquitto restart
+if sudo service mosquitto restart > /dev/null 2>&1
 then
   ok "Mosquito MQTT Broker Restarted Succefully !!"
 else
@@ -173,16 +178,14 @@ fi
 ## Configuring MQTTBroker to UPSplus On HomeAssistant ##
 info "Configuring MQTTBroker to UPSplus On HomeAssistant ..."
 cd /home/pi || error "Cannot find directory"
-#cd ~ || error "Cannot find directory"
-mkdir scripts logs
+mkdir scripts logs | warn "Unable create Scripts logs directories"
 git clone https://github.com/frtz13/UPSPlus_mqtt.git > /dev/null 2>&1
-cp UPSPlus_mqtt/fanShutDownUps.py scripts/fanShutDownUps.py
-cp UPSPlus_mqtt/fanShutDownUps.ini scripts/fanShutDownUps.ini
-cp UPSPlus_mqtt/launcher.sh  scripts/launcher.sh
-sed -i "s/BROKER=.*/BROKER=$MYIP/" scripts/fanShutDownUps.ini || error "Unable to set BROKER into scripts/fanShutDownUps.ini"
-sed -i "s/USERNAME = .*/USERNAME = $MYMQTTUSER/" scripts/fanShutDownUps.ini || error "Unable to set USERNAME into scripts/fanShutDownUps.ini"
-sed -i "s/PASSWORD = .*/PASSWORD = $MYMQTTPASS/" scripts/fanShutDownUps.ini || error "Unable to set PASSWORD into scripts/fanShutDownUps.ini"
-#sed -i "s/\/home\/pi/\/$USER/" scripts/launcher.sh || error "Unable to set right User Directory into scripts/fanShutDownUps.ini"
+cp UPSPlus_mqtt/fanShutDownUps.py scripts/fanShutDownUps.py > /dev/null 2>&1
+cp UPSPlus_mqtt/fanShutDownUps.ini scripts/fanShutDownUps.ini > /dev/null 2>&1
+cp UPSPlus_mqtt/launcher.sh  scripts/launcher.sh > /dev/null 2>&1
+sed -i "s/BROKER=.*/BROKER=$MYIP/" scripts/fanShutDownUps.ini > /dev/null 2>&1 || error "Unable to set BROKER into scripts/fanShutDownUps.ini"
+sed -i "s/USERNAME = .*/USERNAME = $MYMQTTUSER/" scripts/fanShutDownUps.ini > /dev/null 2>&1 || error "Unable to set USERNAME into scripts/fanShutDownUps.ini"
+sed -i "s/PASSWORD = .*/PASSWORD = $MYMQTTPASS/" scripts/fanShutDownUps.ini > /dev/null 2>&1 || error "Unable to set PASSWORD into scripts/fanShutDownUps.ini"
 sudo chown -R pi scripts && sudo chown -R pi logs
 if python3 /home/pi/UPSPlus_mqtt/fanShutDownUps.py --notimerbias &
 then
@@ -378,11 +381,11 @@ if sudo crontab mycron ; then
 else
  error "Some problem adding the Crontab jobs ..."
 fi
-sudo rm mycron
+sudo rm mycron > /dev/null 2>&1
 
 #############
 ## The END ##
 ok "Instalation and Configuration of Raspberry + UPSplus + HomeAssistant COMPLETED !!!"
-apt-get -y autoremove
+apt-get -y autoremove  > /dev/null 2>&1
 info "A reboot command should be executed on this System :) "
 exit 0

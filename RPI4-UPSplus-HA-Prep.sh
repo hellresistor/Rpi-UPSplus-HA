@@ -15,7 +15,7 @@ RPIBUILD="raspberrypi4"
 ###############
 ## Variables ##
 MYIP=$(ifconfig eth0 | awk '{ print $2}' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
-MYDEPPACKAGES=(sudo git curl network-manager software-properties-common apt-transport-https apparmor-utils ca-certificates dbus jq python3 python3-pip i2c-tools mosquitto mosquitto-clients)
+MYDEPPACKAGES=(sudo git curl network-manager software-properties-common apt-transport-https apparmor-utils ca-certificates dbus jq python3 python3-pip i2c-tools mosquitto mosquitto-clients dnsmasq hostapd)
 MYPYTHONDEP=(RPi.GPIO smbus smbus2 pi-ina219 paho-mqtt requests)
 source /etc/os-release
 

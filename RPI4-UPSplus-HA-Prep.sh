@@ -21,10 +21,10 @@ source /etc/os-release
 
 #####################
 ## Basic functions ##
-function ok { echo "[OK] $*"; sleep 0.5; }
-function error { echo "[ERROR] $*"; sleep 0.5; exit 1; }
-function warn { echo "[WARN] $*"; sleep 1; }
-function info { echo "[INFO] $*"; sleep 1; }
+function ok { echo "[OK] $*"; }
+function error { echo "[ERROR] $*"; exit 1; }
+function warn { echo "[WARN] $*"; }
+function info { echo "[INFO] $*"; }
 
 ###################
 ## Verify system ##

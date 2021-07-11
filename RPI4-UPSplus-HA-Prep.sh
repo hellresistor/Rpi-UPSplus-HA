@@ -137,7 +137,7 @@ then
 else
   error "Mosquito MQTT Broker Server NOT Configured ..."
 fi
-if echo -e "${MYMQTTPASS}//n${MYMQTTPASS}" | sudo mosquitto_passwd -c /etc/mosquitto/conf.d/pwfile $MYMQTTUSER
+if echo -e "${MYMQTTPASS}\n${MYMQTTPASS}\n" | sudo mosquitto_passwd -c /etc/mosquitto/conf.d/pwfile $MYMQTTUSER
 then
  ok "Created $MYMQTTUSER User for Mosquitto Succefully !!"
 else

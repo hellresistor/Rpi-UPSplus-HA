@@ -254,7 +254,7 @@ sensor:
     device_class: temperature
     state_topic: "home/rpi/ups"
     value_template: '{{ value_json["BatteryTemperature_degC"] }}'
-    unit_of_measurement: "?C"
+    unit_of_measurement: "°C"
     availability:
       - topic:  "home/rpi/LWT"
         payload_available: "online"
@@ -359,7 +359,6 @@ binary_sensor:
       - topic:  "home/rpi/LWT"
         payload_available: "online"
         payload_not_available: "offline"
-
 EOTF
 then
  ok "Added UPSplus sensors on HomeAssistant configuration.yaml file Succefully !!!"

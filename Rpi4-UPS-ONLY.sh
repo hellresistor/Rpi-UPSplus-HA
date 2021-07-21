@@ -22,13 +22,14 @@ function info { echo "[INFO] $*"; sleep 1; }
 ###################
 ## Verify system ##
 info "Checking Compatible System ..."
-if [[ "$USER" == "pi" ]] ; then
- ok "pi User Logged"
+if [[ "$USER" == "root" ]] ; then
+ error "$USER User NOT VALID. Use other user"
 else
- error "$USER User NOT VALID. Use pi user"
+ ok "$USER User Valid Login"
 fi
 case "${ID,,}" in
  raspbian) ok "Raspbian System Detected !!" ;;
+ debian) ok "Debian System Detected !!" ;;
  *) error "Operating System NOT VALID" ;;
 esac
 case "$(uname -m)" in

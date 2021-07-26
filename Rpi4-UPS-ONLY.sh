@@ -8,8 +8,8 @@
 
 ###############
 ## Variables ##
-MYDEPPACKAGES=(sudo git python3 python3-pip i2c-tools)
-MYPYTHONDEP=(RPi.GPIO smbus smbus2 pi-ina219 paho-mqtt requests)
+MYDEPPACKAGES=(sudo git python3 python3-pip i2c-tools python3-smbus)
+MYPYTHONDEP=(RPi.GPIO smbus smbus2 pi-ina219)
 source /etc/os-release
 
 #####################
@@ -23,9 +23,9 @@ function info { echo "[INFO] $*"; sleep 1; }
 ## Verify system ##
 info "Checking Compatible System ..."
 if [[ "$USER" == "root" ]] ; then
- error "$USER User NOT VALID. Use other user"
-else
  ok "$USER User Valid Login"
+else
+ error "$USER User NOT VALID. Use root"
 fi
 case "${ID,,}" in
  raspbian) ok "Raspbian System Detected !!" ;;
@@ -33,7 +33,8 @@ case "${ID,,}" in
  *) error "Operating System NOT VALID" ;;
 esac
 case "$(uname -m)" in
- aarch64|armv7l) ok "ARCH $(uname -m) Detected !!" ;;
+ aarch64) ok "ARCH $(uname -m) Detected !!" && RPIBOOTDIR="/boot/firmware/config.txt" ;;
+  armv7l) ok "ARCH $(uname -m) Detected !!" && RPIBOOTDIR="/boot/config.txt" ;;
  *) error "$(uname -m) Architeture system NOT VALID" ;;
 esac
 
@@ -62,21 +63,69 @@ done
 ##############################
 ## Configure GeekPi UPSPlus ##
 info "Configuring GeekPi UPSplus ..."
-if sed -i '/^dtparam=i2c_arm=on/a dtoverlay=i2c-rtc,ds1307' /boot/config.txt ; then
-  ok "i2c added into /boot/config.txt file Succefully !!"
+if sed -i '/^dtparam=i2c_arm=on/a dtoverlay=i2c-rtc,ds1307,addr=0x68\ndtoverlay=dwc2,dr_mode=host' "$RPIBOOTDIR" ; then
+ ok "i2c added into $RPIBOOTDIR file Succefully !!"
 else
-  error "i2c NOT added into /boot/config.txt file ..."
+ error "i2c NOT added into $RPIBOOTDIR file ... Add it manually:
+  #I2C UPSplus board
+  dtparam=i2c_arm=on
+  dtoverlay=i2c-rtc,ds1307,addr=0x68
+  dtoverlay=dwc2,dr_mode=host"
+ error "And than reboot Rpi and execute script again "
 fi
+
+cat >> /etc/modules <<EOF
+i2c-dev
+rtc-ds1307
+i2c-bcm2835
+i2c-mux
+i2c-smbus
+dwc2
+EOF
+systemctl restart module-init-tools
+systemctl status module-init-tools
+
+sudo apt-get -y remove fake-hwclock || warn "fake-hwclock not exist..."
+sudo update-rc.d -f fake-hwclock remove || warn "fake-hwclock not exist..."
+
+sed -i '/if \[ -e \/run\/systemd\/system \] \; then/,+2 s/^/#/' /lib/udev/hwclock-set
+
+if hwclock ; then
+ ok "hwclock"
+else
+ warn "Fixing hwclock"
+ mkdir  /usr/lib/systemd/scripts
+cat > /usr/lib/systemd/scripts/rtc <<EOF
+#!/bin/bash
+echo ds1307 0x68 > /sys/class/i2c-adapter/i2c-3/new_device
+hwclock -s
+EOF
+sudo chmod 755 /usr/lib/systemd/scripts/rtc
+cat > /usr/lib/systemd/system/rtc.service <<EOF
+[Unit]
+Description=rtc
+Before=network.target
+
+[Service]
+ExecStart=/usr/lib/systemd/scripts/rtc
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable --now rtc
+fi
+
 cd ~ || error "Cannot find directory"
-if curl -Lso- https://git.io/JLygb | sudo bash > /dev/null 2>&1 ; then
- ok "UPSplus Installed Succefully !!"
-else
- error "A BIG PROBLEM with UPSplus scrypt ..."
-fi
+#if curl -Lso- https://git.io/JLygb | sudo bash > /dev/null 2>&1 ; then
+# ok "UPSplus Installed Succefully !!"
+#else
+# error "A BIG PROBLEM with UPSplus scrypt ..."
+#fi
 
 #############
 ## The END ##
 ok "Instalation and Configuration of RaspberryOS + UPSplus COMPLETED !!!"
-apt-get -y autoremove
 info "A reboot command should be executed on this System :) "
 exit 0

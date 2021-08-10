@@ -58,7 +58,7 @@ for i in "${MYDEPPACKAGES[@]}" ; do
  if command -v "$i" > /dev/null 2>&1; then
   info "Package $i is already Installed ..."
  else 
-  if sudo apt-get -y install "$i" > /dev/null 2>&1; then
+  if apt-get -y install "$i" > /dev/null 2>&1; then
    ok "Package $i installed !!"
   else
    error "Unable install $i package ..."
@@ -74,12 +74,12 @@ done
 ############################
 ## Configuring the System ##
 info "Configuring System ..."
-if sudo systemctl disable ModemManager > /dev/null 2>&1 ; then
+if systemctl disable ModemManager > /dev/null 2>&1 ; then
   ok "ModemManager Disabled !!"
 else
   warn "Some problem on ModemManager service ..."
 fi
-if sudo systemctl stop ModemManager > /dev/null 2>&1 ; then
+if systemctl stop ModemManager > /dev/null 2>&1 ; then
   ok "ModemManager Stopped !!"
 else
   warn "Some problem on ModemManager service ..."
@@ -125,8 +125,8 @@ dwc2" | sudo tee -a /etc/modules-load.d/rpi4.conf
 fi
 systemctl restart module-init-tools
 
-sudo apt-get -y remove fake-hwclock || warn "fake-hwclock not exist..."
-sudo update-rc.d -f fake-hwclock remove || warn "fake-hwclock not exist..."
+apt-get -y remove fake-hwclock || warn "fake-hwclock not exist..."
+update-rc.d -f fake-hwclock remove || warn "fake-hwclock not exist..."
 
 sed -i '/if \[ -e \/run\/systemd\/system \] \; then/,+2 s/^/#/' /lib/udev/hwclock-set
 
@@ -167,7 +167,7 @@ fi
 info "Configuring UPSPlus_mqtt to mqttbrioker On HomeAssistant ..."
 cd /opt || error "Cannot find directory"
 git clone https://github.com/frtz13/UPSPlus_mqtt.git
-cd UPSPlus_mqtt
+cd UPSPlus_mqtt || error "Cannot find directory"
 sed -i "s/BROKER=.*/BROKER = $MYIP/" fanShutDownUps.ini > /dev/null 2>&1 || error "Unable to set BROKER into fanShutDownUps.ini"
 sed -i "s/USERNAME = .*/USERNAME = $MYMQTTUSER/" fanShutDownUps.ini > /dev/null 2>&1 || error "Unable to set USERNAME into fanShutDownUps.ini"
 sed -i "s/PASSWORD = .*/PASSWORD = $MYMQTTPASS/" fanShutDownUps.ini > /dev/null 2>&1 || error "Unable to set PASSWORD into fanShutDownUps.ini"
@@ -203,41 +203,41 @@ RestartSec=3
 WantedBy=multi-user.target
 EOF
 
-sudo ln -s /opt/UPSPlus_mqtt/UPSPlus_mqtt.service /etc/systemd/system/UPSPlus_mqtt.service
-sudo systemctl daemon-reload
+ln -s /opt/UPSPlus_mqtt/UPSPlus_mqtt.service /etc/systemd/system/UPSPlus_mqtt.service
+systemctl daemon-reload
 #sudo systemctl enable UPSPlus_mqtt.service
 
 
 ##############
 # RPiReporter MQTT2HA
-sudo git clone https://github.com/ironsheep/RPi-Reporter-MQTT2HA-Daemon.git /opt/RPi-Reporter-MQTT2HA-Daemon
-cd /opt/RPi-Reporter-MQTT2HA-Daemon
-sudo pip3 install -r requirements.txt || error "Cannot install requirements for RPiReporter MQTT2HA"
-sudo cp /opt/RPi-Reporter-MQTT2HA-Daemon/config.{ini.dist,ini}
+git clone https://github.com/ironsheep/RPi-Reporter-MQTT2HA-Daemon.git /opt/RPi-Reporter-MQTT2HA-Daemon
+cd /opt/RPi-Reporter-MQTT2HA-Daemon || error "Cannot find directory"
+pip3 install -r requirements.txt || error "Cannot install requirements for RPiReporter MQTT2HA"
+cp /opt/RPi-Reporter-MQTT2HA-Daemon/config.{ini.dist,ini}
 sed -i "s/hostname =.*/hostname = $MYIP/" config.ini > /dev/null 2>&1 || error "Unable to set BROKER into config.ini"
 sed -i "s/base_topic =.*/base_topic = home\/sensor/" config.ini > /dev/null 2>&1 || error "Unable to set BROKER into config.ini"
 sed -i "s/username =.*/username = $MYMQTTUSER/" config.ini > /dev/null 2>&1 || error "Unable to set BROKER into config.ini"
 sed -i "s/password =.*/password = $MYMQTTPASS/" config.ini > /dev/null 2>&1 || error "Unable to set BROKER into config.ini"
 
-sudo ln -s /opt/RPi-Reporter-MQTT2HA-Daemon/isp-rpi-reporter.service /etc/systemd/system/isp-rpi-reporter.service
-sudo systemctl daemon-reload
+ln -s /opt/RPi-Reporter-MQTT2HA-Daemon/isp-rpi-reporter.service /etc/systemd/system/isp-rpi-reporter.service
+systemctl daemon-reload
 #sudo systemctl enable isp-rpi-reporter.service
 
 #######################
 ## Configure Crontab ##
 info "Configuring Crontab jobs ..."
-sudo crontab -l > mycron
+crontab -l > mycron
 echo "0 5 * * 5 sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove" >> mycron
 if sudo crontab mycron ; then
  ok "Set Crontab jobs Succefully !! "
 else
  error "Some problem adding the Crontab jobs ..."
 fi
-sudo rm mycron
+rm mycron
 
 info "To Install HA Supervised Do this steps...."
 info " 1- on user session run:  sudo -i "
-info " 2- in root session run:  curl -sL "https://raw.githubusercontent.com/Kanga-Who/home-assistant/master/supervised-installer.sh" | bash -s -- -m "$RPIBUILD" "
+info " 2- in root session run:  curl -sL https://raw.githubusercontent.com/Kanga-Who/home-assistant/master/supervised-installer.sh | bash -s -- -m $RPIBUILD"
 info " 3- Wait .... until first HA wizard configuration (on webpage)."
 
 exit 0

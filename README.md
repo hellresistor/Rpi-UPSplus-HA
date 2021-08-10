@@ -16,7 +16,7 @@
 
 *Software Used:*
  - Debian OS 
- - HomeAssistant Supervised
+ - @Kanga-Who HomeAssistant Supervised script
  - Mosquitto MQQT Broker Localserver
  - @geeekpi UPSplus python script
  - @frtz13 UPSplus Reporter python script

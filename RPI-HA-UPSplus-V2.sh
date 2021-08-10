@@ -34,15 +34,14 @@ function info { echo -e "${bluey}[INFO] $* ${endy}"; }
 ###################
 ## Verify system ##
 info "Checking Compatible System ..."
-if [[ "$USER" == "pi" ]] ; then
- error "Please use < sudo -i > command to log as root"
-elif [[ "$USER" == "root" ]]; then
+if [[ "$USER" == "root" ]] ; then
  ok "Root User Logged"
 else
- error "$USER User NOT VALID. Use root"
+ error "Please use < sudo -i > command to log as root"
 fi
 case "${ID,,}" in
  raspbian) ok "Raspbian System Detected !!" ;;
+ debian) ok "Debian System Detected !!" ;;
  *) error "Operating System NOT VALID" ;;
 esac
 case "$(uname -m)" in
@@ -95,12 +94,6 @@ if curl -fsSL get.docker.com | sh ; then
 else
  error "A DOCKER BIG PROBLEM !!!!"
 fi
-
-info "To Install HA Supervised Do this steps...."
-info " 1- on user session run:  sudo -i "
-info " 2- in root session run:  curl -sL "https://raw.githubusercontent.com/Kanga-Who/home-assistant/master/supervised-installer.sh" | bash -s -- -m "$RPIBUILD" "
-info " 3- Wait .... until first HA wizard configuration (on webpage)."
-
 
 ##############################
 ## Configure GeekPi UPSPlus ##
@@ -169,9 +162,6 @@ fi
 # error "A BIG PROBLEM with UPSplus scrypt ..."
 #fi
 
-
-
-
 ########################################################
 ## Configuring MQTTBroker to UPSplus On HomeAssistant ##
 info "Configuring UPSPlus_mqtt to mqttbrioker On HomeAssistant ..."
@@ -215,7 +205,7 @@ EOF
 
 sudo ln -s /opt/UPSPlus_mqtt/UPSPlus_mqtt.service /etc/systemd/system/UPSPlus_mqtt.service
 sudo systemctl daemon-reload
-sudo systemctl enable UPSPlus_mqtt.service
+#sudo systemctl enable UPSPlus_mqtt.service
 
 
 ##############
@@ -231,8 +221,7 @@ sed -i "s/password =.*/password = $MYMQTTPASS/" config.ini > /dev/null 2>&1 || e
 
 sudo ln -s /opt/RPi-Reporter-MQTT2HA-Daemon/isp-rpi-reporter.service /etc/systemd/system/isp-rpi-reporter.service
 sudo systemctl daemon-reload
-sudo systemctl enable isp-rpi-reporter.service
-
+#sudo systemctl enable isp-rpi-reporter.service
 
 #######################
 ## Configure Crontab ##
@@ -246,9 +235,9 @@ else
 fi
 sudo rm mycron
 
-#############
-## The END ##
-ok "Instalation and Configuration of Raspberry + UPSplus + HomeAssistant COMPLETED !!!"
-apt-get -y autoremove  > /dev/null 2>&1
-info "A reboot command should be executed on this System :) "
+info "To Install HA Supervised Do this steps...."
+info " 1- on user session run:  sudo -i "
+info " 2- in root session run:  curl -sL "https://raw.githubusercontent.com/Kanga-Who/home-assistant/master/supervised-installer.sh" | bash -s -- -m "$RPIBUILD" "
+info " 3- Wait .... until first HA wizard configuration (on webpage)."
+
 exit 0
